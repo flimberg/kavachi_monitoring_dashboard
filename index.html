@@ -318,7 +318,7 @@
   </div>
 
   <div id="footer">
-      A project by the Seismology group of **Goethe-University Frankfurt (Germany)** &amp; **Geology Division of Ministry of Mines (Solomon Islands)**
+      A project by the Seismology group of **Goethe-University Frankfurt (Germany)** & **Geology Division of Ministry of Mines (Solomon Islands)**
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -338,9 +338,11 @@
     function applyScheme(isLight) {
         if (isLight) {
             body.classList.add('light-scheme');
+            // Only check the box if we're setting it to light mode
             if (!toggleSwitch.checked) toggleSwitch.checked = true;
         } else {
             body.classList.remove('light-scheme');
+            // Only uncheck the box if we're setting it to dark mode
             if (toggleSwitch.checked) toggleSwitch.checked = false;
         }
         
@@ -377,15 +379,17 @@
     });
 
     const savedScheme = localStorage.getItem('colorScheme');
-    const prefersLight = savedScheme === null && window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches;
 
+    // --- MODIFIED LOGIC: Dark Scheme is DEFAULT ---
     if (savedScheme === 'light') {
-        applyScheme(true);
-    } else if (prefersLight) {
+        // If user explicitly saved light, apply light scheme
         applyScheme(true);
     } else {
+        // Otherwise (saved dark, no saved preference, or system preference is light), 
+        // default to dark scheme.
         applyScheme(false); 
     }
+    // ---------------------------------------------
 
     // -------------------------------------------------
     // Load CSV
