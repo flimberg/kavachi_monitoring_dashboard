@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kavachi Volcano Activity Dashboard</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    body {
+      font-family: system-ui, sans-serif;
+      background: #f8f8f8;
+      color: #222;
+      margin: 0;
+      padding: 1rem;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    p.description {
+      text-align: center;
+      font-size: 0.95rem;
+      color: #444;
+      margin: 0 auto 1rem auto;
+      max-width: 800px;
+      line-height: 1.4;
+    }
+    #chart-container {
+      width: 90%;
+      max-width: 1000px;
+      margin: auto;
+      background: white;
+      border-radius: 10px;
+      padding: 1rem;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      position: relative;
+    }
+    #dayplot {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      margin-top: 1rem;
+    }
+    #dayplot h2 {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 0.5rem;
+    }
+    #dayplot img {
+      width: 40%;
+      min-width: 250px;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+    #livestream {
+      display: flex;
+      justify-content: center;
+      margin-top: 2rem;
+    }
+    canvas {
+      display: block;
+      width: 100%;
+      height: 400px;
+    }
+    /* 🔄 Loading Spinner */
+    #loading {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(255, 255, 255, 0.85);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.2rem;
+      color: #333;
+      z-index: 9999;
+    }
+    .spinner {
+      border: 4px solid #ddd;
+      border-top: 4px solid #444;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      animation: spin 1s linear infinite;
+      margin-bottom: 10px;
+    }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+  </style>
+</head>
+<body>
+  <div id="loading">
+    <div class="spinner"></div>
+    Loading data...
+  </div>
+
+  <h1>Kavachi Volcano Activity Dashboard</h1>
+  <p class="description">
+    The activity level (<span style="color:red;">in red</span>) reflects the overall seismic activity of Kavachi. 
+    When volcanic tremor becomes the dominant signal, the tremor score (<span style="color:blue;">in blue</span>) increases accordingly..
+  </p>
+   <p class="description">
+    (Click in the plot to print the dayplot for the clicked date.)
+  </p>
+
+  <div id="chart-container">
+    <canvas id="scoreChart"></canvas>
+  </div>
+
+  <div id="dayplot">
+    <h2 id="dayplot-title">Click on the plot to view a dayplot</h2>
+    <img id="dayplot-img" src="" alt="">
+  </div>
+
+  <div id="livestream">
+    <iframe
+      width="1000"
+      height="350"
+      src="https://dataview.raspberryshake.org/#/embed/AM/RF90E/00/EHZ"
+      frameborder="0"
+      allowfullscreen>
+    </iframe>
+  </div>
+
+  <script>
+    // -------------------------------------------------
+    // Load CSV
+    // -------------------------------------------------
+    async function loadScores() {
+      const resp = await fetch("processed_activity.csv?nocache=" + Date.now());
+      const text = await resp.text();
+      const rows = text.trim().split("\n");
+      const header = rows[0].split(",").map(h => h.trim());
+      const timeIdx = header.indexOf("time");
+      const tremorIdx = header.indexOf("tremor_score_blue");
+      const activityIdx = header.indexOf("activity_score_red");
+
+      const times = [], tremor = [], activity = [], days = [];
+
+      for (let i = 1; i < rows.length; i++) {
+        const cols = rows[i].split(",");
+        if (cols.length < 3) continue;
+        const t = cols[timeIdx].trim();
+        const dateObj = new Date(t);
+        if (isNaN(dateObj)) continue;
+        const dateStr = dateObj.toISOString().split("T")[0];
+        const dateLabel = dateStr.replace(/-/g, "/");
+        const trem = parseFloat(cols[tremorIdx]);
+        const act = parseFloat(cols[activityIdx]);
+        if (!isNaN(trem) && !isNaN(act)) {
+          times.push(dateLabel);
+          tremor.push(trem);
+          activity.push(act);
+          days.push(dateStr);
+        }
+      }
+      return { times, tremor, activity, days };
+    }
+
+    // -------------------------------------------------
+    // Show dayplot for selected date
+    // -------------------------------------------------
+    function showDayplot(dateStr) {
+      const imgEl = document.getElementById("dayplot-img");
+      const titleEl = document.getElementById("dayplot-title");
+      const path = `dayplots/AM_RF90E_EHZ_${dateStr}_5-40Hz.png`;
+      imgEl.src = path;
+      imgEl.alt = `Dayplot for ${dateStr}`;
+      titleEl.textContent = `Dayplot for ${dateStr}`;
+    }
+
+    // -------------------------------------------------
+    // Chart.js vertical line plugin
+    // -------------------------------------------------
+    const verticalLinePlugin = {
+      id: "verticalLine",
+      afterDraw(chart, args, options) {
+        const index = options.index;
+        if (index != null && index >= 0) {
+          const x = chart.scales.x.getPixelForValue(index);
+          const ctx = chart.ctx;
+          ctx.save();
+          ctx.beginPath();
+          ctx.moveTo(x, chart.chartArea.top);
+          ctx.lineTo(x, chart.chartArea.bottom);
+          ctx.lineWidth = 1.5;
+          ctx.strokeStyle = "black";
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+    };
+
+    // -------------------------------------------------
+    // Draw chart and handle clicks
+    // -------------------------------------------------
+    async function drawChart() {
+      const { times, tremor, activity, days } = await loadScores();
+      const ctx = document.getElementById("scoreChart").getContext("2d");
+
+      let selectedIndex = days.length - 1;
+
+      const chart = new Chart(ctx, {
+        type: "line",
+        data: {
+          labels: times,
+          datasets: [
+            {
+              label: "Tremor Score (blue)",
+              data: tremor,
+              borderColor: "blue",
+              borderWidth: 1.0,
+              tension: 0.3,
+              fill: false,
+              pointRadius: 0
+            },
+            {
+              label: "Activity Score (red)",
+              data: activity,
+              borderColor: "red",
+              borderWidth: 1.0,
+              tension: 0.3,
+              fill: false,
+              pointRadius: 0
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 1,
+              title: { display: true, text: "Score" }
+            },
+            x: {
+              ticks: { maxTicksLimit: 10 },
+              title: { display: true, text: "Date (YYYY/MM/DD)" }
+            }
+          },
+          plugins: {
+            legend: { position: "top" },
+            title: { display: true, text: "Tremor and Activity Scores Over Time" },
+            tooltip: { enabled: false },
+            verticalLine: { index: selectedIndex }
+          },
+          events: ["click"]
+        },
+        plugins: [verticalLinePlugin]
+      });
+
+      document.getElementById("scoreChart").addEventListener("click", (evt) => {
+        const xScale = chart.scales.x;
+        const canvasPosition = Chart.helpers.getRelativePosition(evt, chart);
+        const valueX = xScale.getValueForPixel(canvasPosition.x);
+        let closestIndex = Math.round(valueX);
+        if (closestIndex < 0) closestIndex = 0;
+        if (closestIndex >= days.length) closestIndex = days.length - 1;
+
+        chart.options.plugins.verticalLine.index = closestIndex;
+        chart.update("none");
+        showDayplot(days[closestIndex]);
+      });
+
+      document.getElementById("loading").style.display = "none";
+
+      if (days.length > 0) {
+        chart.options.plugins.verticalLine.index = selectedIndex;
+        chart.update("none");
+        showDayplot(days[selectedIndex]);
+      }
+    }
+
+    drawChart();
+  </script>
+</body>
+</html>
