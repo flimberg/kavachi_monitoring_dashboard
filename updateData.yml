@@ -25,7 +25,10 @@ jobs:
 
     - name: Run Python script
       run: |
-        python makeNewKavachiData.py
+        python AfetchData.py
+        python BmakeKavachiNoiseProfile.py        
+        python CsaveActivityCurves.py
+        python DsaveDayplots.py
 
     - name: Commit and push results
       run: |
