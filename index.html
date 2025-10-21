@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Kavachi Volcano Activity Dashboard</title>
   <style>
-    /* GENERAL STYLING */
+    /* ... (GENERAL STYLING and other blocks remain the same) ... */
     :root {
       /* DARK SCHEME (Default) */
       --bg-color: #1e2a35; /* Dark background for body */
@@ -17,6 +17,11 @@
       --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
       --line-color: #444444; /* Dark line for vertical line plugin */
       --grid-color: rgba(0, 0, 0, 0.2); /* Dark grid lines on light plot background */
+      
+      /* New Button Colors */
+      --button-bg: #4a90e2; /* Blue */
+      --button-hover-bg: #3a7bd5;
+      --button-text: #ffffff;
     }
 
     /* LIGHT SCHEME OVERRIDES */
@@ -31,6 +36,10 @@
       --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       --line-color: #444444;
       --grid-color: rgba(0, 0, 0, 0.1);
+
+      /* New Button Colors */
+      --button-bg: #1e71ba; 
+      --button-hover-bg: #155a9b;
     }
 
     body {
@@ -188,6 +197,31 @@
         transform: translateX(26px);
     }
 
+    /* DOWNLOAD BUTTON STYLES */
+    #download-button-container {
+        width: 90%;
+        max-width: 1000px;
+        margin: 0rem auto 1rem auto; /* Adjust margin to place it nicely above the map */
+        text-align: center; /* ALIGN BUTTON TO THE CENTER */
+    }
+
+    #download-zip-button {
+        padding: 12px 25px; /* INCREASE PADDING FOR BIGGER BUTTON */
+        background-color: var(--button-bg);
+        color: var(--button-text);
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 1rem; /* INCREASE FONT SIZE */
+        transition: background-color 0.2s, box-shadow 0.2s;
+    }
+
+    #download-zip-button:hover {
+        background-color: var(--button-hover-bg);
+        box-shadow: var(--box-shadow);
+    }
+    
     /* LOADING SPINNER */
     #loading {
       position: fixed;
@@ -309,6 +343,10 @@
     </div>
   </div>
   
+  <div id="download-button-container">
+      <button id="download-zip-button" onclick="downloadAllDayplots()">Download All Dayplots (ZIP)</button>
+  </div>
+  
   <div id="map-wrapper">
       <div class="embed-map-responsive">
           <div class="embed-map-container">
@@ -318,7 +356,7 @@
   </div>
 
   <div id="footer">
-      A project by the Seismology group of Goethe-University Frankfurt (Germany) & Geology Division of Ministry of Mines (Solomon Islands)
+      A project by the Seismology group of **Goethe-University Frankfurt (Germany)** & **Geology Division of Ministry of Mines (Solomon Islands)**
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -390,6 +428,19 @@
         applyScheme(false); 
     }
     // ---------------------------------------------
+    
+    // -------------------------------------------------
+    // DOWNLOAD BUTTON LOGIC
+    // -------------------------------------------------
+    function downloadAllDayplots() {
+        // In a real-world scenario, this function would initiate a request
+        // to a backend service that aggregates all dayplots and serves them
+        // as a single ZIP file.
+        alert("Download initiated. A real-world application would now start downloading a ZIP file generated on the server.");
+        
+        // Example of a typical download initiation (if a fixed endpoint existed):
+        // window.location.href = '/api/download/all_dayplots.zip';
+    }
 
     // -------------------------------------------------
     // Load CSV
@@ -487,7 +538,7 @@
               label: "Tremor Score (blue)",
               data: tremor,
               borderColor: "blue",
-              borderWidth: 1.0,
+              borderWidth: 1.2,
               tension: 0.3,
               fill: false,
               pointRadius: 0
@@ -496,7 +547,7 @@
               label: "Activity Score (red)",
               data: activity,
               borderColor: "red",
-              borderWidth: 1.0,
+              borderWidth: 1.2,
               tension: 0.3,
               fill: false,
               pointRadius: 0
@@ -563,4 +614,3 @@
   </script>
 </body>
 </html>
-
