@@ -404,7 +404,7 @@
     else applyScheme(false);
 
     async function loadScores() {
-      const resp = await fetch("processed_activity.csv?nocache=" + Date.now());
+      const resp = await fetch("processed_activity2.csv?nocache=" + Date.now());
       const text = await resp.text();
       const rows = text.trim().split("\n");
       const header = rows[0].split(",").map(h => h.trim());
@@ -552,6 +552,7 @@
   </script>
 </body>
 </html>
+
 
 
 
