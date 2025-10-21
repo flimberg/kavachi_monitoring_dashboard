@@ -21,11 +21,11 @@ jobs:
 
     - name: Install dependencies
       run: |
-        pip install -r requirements.txt
+        pip install obspy matplotlib pandas
 
     - name: Run Python script
       run: |
-        python generate_data.py
+        python makeNewKavachiData.py
 
     - name: Commit and push results
       run: |
