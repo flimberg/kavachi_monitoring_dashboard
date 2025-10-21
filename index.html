@@ -4,41 +4,33 @@
   <meta charset="UTF-8">
   <title>Kavachi Volcano Activity Dashboard</title>
   <style>
-    /* ... (GENERAL STYLING and other blocks remain the same) ... */
     :root {
       /* DARK SCHEME (Default) */
-      --bg-color: #1e2a35; /* Dark background for body */
-      --text-color: #f5f5f5; /* Light text for body and scheme labels */
+      --bg-color: #1e2a35;
+      --text-color: #f5f5f5;
       --header-color: #ffffff;
       
-      /* PLOT (Chart) remains LIGHT in Dark Mode */
-      --chart-bg-color: #fefefe; 
-      --chart-text-color: #333333; /* Dark text/ticks on light plot background */
+      --chart-bg-color: #fefefe;
+      --chart-text-color: #333333;
       --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
-      --line-color: #444444; /* Dark line for vertical line plugin */
-      --grid-color: rgba(0, 0, 0, 0.2); /* Dark grid lines on light plot background */
+      --line-color: #444444;
+      --grid-color: rgba(0, 0, 0, 0.2);
       
-      /* New Button Colors */
-      --button-bg: #4a90e2; /* Blue */
+      --button-bg: #4a90e2;
       --button-hover-bg: #3a7bd5;
       --button-text: #ffffff;
     }
 
-    /* LIGHT SCHEME OVERRIDES */
     body.light-scheme {
       --bg-color: #f0f0f5;
       --text-color: #333333;
       --header-color: #1e2a35;
-      
-      /* Plot remains consistent in Light Mode */
       --chart-bg-color: #ffffff;
       --chart-text-color: #333333;
       --box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
       --line-color: #444444;
       --grid-color: rgba(0, 0, 0, 0.1);
-
-      /* New Button Colors */
-      --button-bg: #1e71ba; 
+      --button-bg: #1e71ba;
       --button-hover-bg: #155a9b;
     }
 
@@ -48,7 +40,7 @@
       color: var(--text-color);
       margin: 0;
       padding: 1rem;
-      transition: background-color 0.15s, color 0.15s; 
+      transition: background-color 0.15s, color 0.15s;
     }
 
     h1 {
@@ -66,7 +58,6 @@
       line-height: 1.4;
     }
 
-    /* CHART CONTAINER */
     #chart-container {
       width: 90%;
       max-width: 1000px;
@@ -81,14 +72,12 @@
     }
 
     canvas {
-      /* Ensure canvas background matches container background for grid contrast */
       background-color: var(--chart-bg-color);
       display: block;
       width: 100%;
       height: 400px;
     }
 
-    /* SECOND ROW: DAYPLOT + LIVESTREAM SIDE BY SIDE */
     #second-row {
       display: flex;
       justify-content: center;
@@ -100,7 +89,7 @@
     }
 
     #dayplot, #livestream {
-      flex: 1 1 48%; /* Ensures similar width */
+      flex: 1 1 48%;
       max-width: 500px;
       min-width: 300px;
       text-align: center;
@@ -115,98 +104,92 @@
 
     #dayplot img {
       width: 100%;
-      max-width: none;
       border-radius: 8px;
       box-shadow: var(--box-shadow);
-      height: 350px; /* Ensures similar height to iframe */
-      object-fit: cover; 
+      height: 350px;
+      object-fit: cover;
     }
 
     #livestream iframe {
       width: 100%;
-      height: 350px; /* Ensures similar height to dayplot img */
+      height: 350px;
       border-radius: 8px;
       box-shadow: var(--box-shadow);
     }
 
-    /* SCHEME TOGGLE SWITCH AND LABELS */
     #scheme-toggle-container {
-        position: absolute;
-        top: 1rem;
-        right: 1rem;
-        z-index: 1000;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
+      position: absolute;
+      top: 1rem;
+      right: 1rem;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
     }
 
     #scheme-toggle-container span {
-        font-size: 0.9rem;
-        font-weight: 500;
-        color: var(--text-color);
-        transition: color 0.15s;
+      font-size: 0.9rem;
+      font-weight: 500;
+      color: var(--text-color);
+      transition: color 0.15s;
     }
 
     .toggle-switch {
-        position: relative;
-        display: inline-block;
-        width: 60px;
-        height: 34px;
+      position: relative;
+      display: inline-block;
+      width: 60px;
+      height: 34px;
     }
 
     .toggle-switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
+      opacity: 0;
+      width: 0;
+      height: 0;
     }
 
     .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        transition: 0.4s;
-        border-radius: 34px;
+      position: absolute;
+      cursor: pointer;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background-color: #ccc;
+      transition: 0.4s;
+      border-radius: 34px;
     }
 
     .slider:before {
-        position: absolute;
-        content: "";
-        height: 26px;
-        width: 26px;
-        left: 4px;
-        bottom: 4px;
-        background-color: white;
-        transition: 0.4s;
-        border-radius: 50%;
+      position: absolute;
+      content: "";
+      height: 26px;
+      width: 26px;
+      left: 4px;
+      bottom: 4px;
+      background-color: white;
+      transition: 0.4s;
+      border-radius: 50%;
     }
 
     input:checked + .slider {
-        /* Darker blue for checked state, matching dark theme */
-        background-color: #1976D2; 
+      background-color: #1976D2;
     }
 
     input:focus + .slider {
-        box-shadow: 0 0 1px #1976D2;
+      box-shadow: 0 0 1px #1976D2;
     }
 
     input:checked + .slider:before {
-        transform: translateX(26px);
+      transform: translateX(26px);
     }
 
-   
-    
-    /* LOADING SPINNER */
     #loading {
       position: fixed;
       top: 0;
       left: 0;
       right: 0;
       bottom: 0;
-      background: rgba(30, 42, 53, 0.9); /* Use fixed color for spinner background */
+      background: rgba(30, 42, 53, 0.9);
       display: flex;
       flex-direction: column;
       align-items: center;
@@ -232,48 +215,70 @@
       to { transform: rotate(360deg); }
     }
 
-    /* FOOTER STYLES */
     #footer {
-        text-align: center;
-        font-size: 0.75rem; /* Small font size */
-        margin-top: 1rem;
-        padding: 0.5rem;
-        color: var(--text-color);
-        opacity: 0.7;
-    }
-    
-    /* MAP CONTAINER STYLES */
-    #map-wrapper {
-        width: 90%;
-        max-width: 1000px;
-        margin: 2rem auto; /* Added margin for separation */
-        border-radius: 10px;
-        box-shadow: var(--box-shadow);
-        overflow: hidden; /* Contains the map's shadow */
+      text-align: center;
+      font-size: 0.75rem;
+      margin-top: 1rem;
+      padding: 0.5rem;
+      color: var(--text-color);
+      opacity: 0.7;
     }
 
-    /* Map embed responsiveness CSS (from your provided code, slightly modified for clarity) */
-    .embed-map-responsive{
-        position:relative;
-        width:100%;
-        height:0;
-        padding-bottom:60%; /* Adjusted height to 60% of width for better desktop fit */
+    #map-wrapper {
+      width: 90%;
+      max-width: 1000px;
+      margin: 2rem auto;
+      border-radius: 10px;
+      box-shadow: var(--box-shadow);
+      overflow: hidden;
     }
-    .embed-map-container{
-        overflow:hidden;
-        background:none!important;
-        width:100%;
-        height:100%;
-        position:absolute;
-        top:0;
-        left:0;
+
+    .embed-map-responsive {
+      position: relative;
+      width: 100%;
+      height: 0;
+      padding-bottom: 60%;
     }
-    .embed-map-frame{
-        width:100%!important;
-        height:100%!important;
-        position:absolute;
-        top:0;
-        left:0;
+
+    .embed-map-container {
+      overflow: hidden;
+      background: none !important;
+      width: 100%;
+      height: 100%;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    .embed-map-frame {
+      width: 100% !important;
+      height: 100% !important;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+
+    /* ✅ BUTTON STYLES */
+    .action-button {
+      display: inline-block;
+      margin-top: 0.8rem;
+      padding: 0.6rem 1.2rem;
+      background-color: var(--button-bg);
+      color: var(--button-text);
+      text-decoration: none;
+      font-weight: 600;
+      border-radius: 8px;
+      box-shadow: var(--box-shadow);
+      transition: background-color 0.2s, transform 0.1s;
+    }
+
+    .action-button:hover {
+      background-color: var(--button-hover-bg);
+      transform: translateY(-2px);
+    }
+
+    .action-button:active {
+      transform: translateY(0);
     }
   </style>
 </head>
@@ -308,6 +313,15 @@
     <div id="dayplot">
       <h2 id="dayplot-title">Click on the plot to view a dayplot</h2>
       <img id="dayplot-img" src="" alt="">
+      <br>
+      <!-- ✅ Download all day plots button -->
+      <a 
+        href="https://download-directory.github.io/?url=https%3A%2F%2Fgithub.com%2Fflimberg%2Fkavachi_monitoring_dashboard%2Ftree%2Fe71cc0d8b1ed0c76a98b1aa6bdaad2a298e4d775%2Fdayplots" 
+        target="_blank" 
+        class="action-button"
+      >
+        Download all day plots
+      </a>
     </div>
 
     <div id="livestream">
@@ -317,10 +331,18 @@
         frameborder="0"
         allowfullscreen>
       </iframe>
+      <br>
+      <!-- ✅ Raspberry Shake button -->
+      <a 
+        href="https://dataview.raspberryshake.org/#/AM/RF90E/00/EHZ" 
+        target="_blank" 
+        class="action-button"
+      >
+        Go to Raspberry Shake site
+      </a>
     </div>
   </div>
 
-  
   <div id="map-wrapper">
       <div class="embed-map-responsive">
           <div class="embed-map-container">
@@ -336,76 +358,51 @@
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
   <script>
-    // -------------------------------------------------
-    // SCHEME TOGGLE LOGIC
-    // -------------------------------------------------
     const toggleSwitch = document.getElementById('scheme-toggle');
     const body = document.body;
-    let currentChart = null; 
+    let currentChart = null;
 
     function getCSSVar(name) {
-        return getComputedStyle(body).getPropertyValue(name).trim();
+      return getComputedStyle(body).getPropertyValue(name).trim();
     }
 
     function applyScheme(isLight) {
-        if (isLight) {
-            body.classList.add('light-scheme');
-            // Only check the box if we're setting it to light mode
-            if (!toggleSwitch.checked) toggleSwitch.checked = true;
-        } else {
-            body.classList.remove('light-scheme');
-            // Only uncheck the box if we're setting it to dark mode
-            if (toggleSwitch.checked) toggleSwitch.checked = false;
-        }
-        
-        if (currentChart) {
-            updateChartColors(currentChart);
-        }
+      if (isLight) {
+        body.classList.add('light-scheme');
+        if (!toggleSwitch.checked) toggleSwitch.checked = true;
+      } else {
+        body.classList.remove('light-scheme');
+        if (toggleSwitch.checked) toggleSwitch.checked = false;
+      }
+      if (currentChart) updateChartColors(currentChart);
     }
 
     function updateChartColors(chart) {
-        const chartBgColor = getCSSVar('--chart-bg-color');
-        const chartTextColor = getCSSVar('--chart-text-color');
-        const gridColor = getCSSVar('--grid-color');
-        const lineColor = getCSSVar('--line-color');
-
-        chart.canvas.style.backgroundColor = chartBgColor;
-
-        chart.options.scales.y.ticks.color = chartTextColor;
-        chart.options.scales.y.title.color = chartTextColor;
-        chart.options.scales.y.grid.color = gridColor;
-
-        chart.options.scales.x.ticks.color = chartTextColor;
-        chart.options.scales.x.title.color = chartTextColor;
-        chart.options.scales.x.grid.color = gridColor;
-        
-        chart.options.plugins.title.color = chartTextColor;
-        chart.options.plugins.verticalLine.color = lineColor; 
-
-        chart.update('none'); 
+      const chartBgColor = getCSSVar('--chart-bg-color');
+      const chartTextColor = getCSSVar('--chart-text-color');
+      const gridColor = getCSSVar('--grid-color');
+      const lineColor = getCSSVar('--line-color');
+      chart.canvas.style.backgroundColor = chartBgColor;
+      chart.options.scales.y.ticks.color = chartTextColor;
+      chart.options.scales.y.title.color = chartTextColor;
+      chart.options.scales.y.grid.color = gridColor;
+      chart.options.scales.x.ticks.color = chartTextColor;
+      chart.options.scales.x.title.color = chartTextColor;
+      chart.options.scales.x.grid.color = gridColor;
+      chart.options.plugins.title.color = chartTextColor;
+      chart.options.plugins.verticalLine.color = lineColor;
+      chart.update('none');
     }
 
     toggleSwitch.addEventListener('change', () => {
-        applyScheme(toggleSwitch.checked);
-        localStorage.setItem('colorScheme', toggleSwitch.checked ? 'light' : 'dark');
+      applyScheme(toggleSwitch.checked);
+      localStorage.setItem('colorScheme', toggleSwitch.checked ? 'light' : 'dark');
     });
 
     const savedScheme = localStorage.getItem('colorScheme');
+    if (savedScheme === 'light') applyScheme(true);
+    else applyScheme(false);
 
-    // --- MODIFIED LOGIC: Dark Scheme is DEFAULT ---
-    if (savedScheme === 'light') {
-        // If user explicitly saved light, apply light scheme
-        applyScheme(true);
-    } else {
-        // Otherwise (saved dark, no saved preference, or system preference is light), 
-        // default to dark scheme.
-        applyScheme(false); 
-    }
-    // ---------------------------------------------    
-
-    // -------------------------------------------------
-    // Load CSV
-    // -------------------------------------------------
     async function loadScores() {
       const resp = await fetch("processed_activity.csv?nocache=" + Date.now());
       const text = await resp.text();
@@ -437,27 +434,20 @@
       return { times, tremor, activity, days };
     }
 
-    // -------------------------------------------------
-    // Show dayplot for selected date
-    // -------------------------------------------------
     function showDayplot(dateStr) {
       const imgEl = document.getElementById("dayplot-img");
       const titleEl = document.getElementById("dayplot-title");
-      const path = `dayplots/AM_RF90E_EHZ_${dateStr}_5-40Hz.png`; 
+      const path = `dayplots/AM_RF90E_EHZ_${dateStr}_5-40Hz.png`;
       imgEl.src = path;
       imgEl.alt = `Dayplot for ${dateStr}`;
       titleEl.textContent = `Dayplot for ${dateStr}`;
     }
 
-    // -------------------------------------------------
-    // Chart.js vertical line plugin
-    // -------------------------------------------------
     const verticalLinePlugin = {
       id: "verticalLine",
       afterDraw(chart, args, options) {
         const index = options.index;
-        const lineColor = getCSSVar('--line-color'); 
-
+        const lineColor = getCSSVar('--line-color');
         if (index != null && index >= 0) {
           const x = chart.scales.x.getPixelForValue(index);
           const ctx = chart.ctx;
@@ -466,31 +456,26 @@
           ctx.moveTo(x, chart.chartArea.top);
           ctx.lineTo(x, chart.chartArea.bottom);
           ctx.lineWidth = 1.5;
-          ctx.strokeStyle = lineColor; 
+          ctx.strokeStyle = lineColor;
           ctx.stroke();
           ctx.restore();
         }
       }
     };
 
-    // -------------------------------------------------
-    // Draw chart and handle clicks
-    // -------------------------------------------------
     async function drawChart() {
       const { times, tremor, activity, days } = await loadScores();
-      
       const canvas = document.getElementById("scoreChart");
       const ctx = canvas.getContext("2d");
       let selectedIndex = days.length - 1;
-      
+
       const chartBgColor = getCSSVar('--chart-bg-color');
       const chartTextColor = getCSSVar('--chart-text-color');
       const gridColor = getCSSVar('--grid-color');
       const lineColor = getCSSVar('--line-color');
-      
       canvas.style.backgroundColor = chartBgColor;
 
-      currentChart = new Chart(ctx, { 
+      currentChart = new Chart(ctx, {
         type: "line",
         data: {
           labels: times,
@@ -533,22 +518,16 @@
             }
           },
           plugins: {
-            legend: { 
-              position: "top",
-              labels: {
-                usePointStyle: true,
-                pointStyle: 'line',
-              }
-            },
+            legend: { position: "top", labels: { usePointStyle: true, pointStyle: 'line' } },
             title: { display: true, text: "Tremor and Activity Scores Over Time", color: chartTextColor },
             tooltip: { enabled: false },
-            verticalLine: { index: selectedIndex, color: lineColor } 
+            verticalLine: { index: selectedIndex, color: lineColor }
           },
           events: ["click"]
         },
         plugins: [verticalLinePlugin]
       });
-      
+
       document.getElementById("scoreChart").addEventListener("click", (evt) => {
         const xScale = currentChart.scales.x;
         const canvasPosition = Chart.helpers.getRelativePosition(evt, currentChart);
@@ -556,14 +535,12 @@
         let closestIndex = Math.round(valueX);
         if (closestIndex < 0) closestIndex = 0;
         if (closestIndex >= days.length) closestIndex = days.length - 1;
-
         currentChart.options.plugins.verticalLine.index = closestIndex;
         currentChart.update("none");
         showDayplot(days[closestIndex]);
       });
 
       document.getElementById("loading").style.display = "none";
-
       if (days.length > 0) {
         currentChart.options.plugins.verticalLine.index = selectedIndex;
         currentChart.update("none");
@@ -575,8 +552,3 @@
   </script>
 </body>
 </html>
-
-
-
-
-
