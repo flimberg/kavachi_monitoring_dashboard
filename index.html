@@ -197,30 +197,7 @@
         transform: translateX(26px);
     }
 
-    /* DOWNLOAD BUTTON STYLES */
-    #download-button-container {
-        width: 90%;
-        max-width: 1000px;
-        margin: 0rem auto 1rem auto; /* Adjust margin to place it nicely above the map */
-        text-align: center; /* ALIGN BUTTON TO THE CENTER */
-    }
-
-    #download-zip-button {
-        padding: 12px 25px; /* INCREASE PADDING FOR BIGGER BUTTON */
-        background-color: var(--button-bg);
-        color: var(--button-text);
-        border: none;
-        border-radius: 5px;
-        cursor: pointer;
-        font-weight: 600;
-        font-size: 1rem; /* INCREASE FONT SIZE */
-        transition: background-color 0.2s, box-shadow 0.2s;
-    }
-
-    #download-zip-button:hover {
-        background-color: var(--button-hover-bg);
-        box-shadow: var(--box-shadow);
-    }
+   
     
     /* LOADING SPINNER */
     #loading {
@@ -342,10 +319,7 @@
       </iframe>
     </div>
   </div>
-  
-  <div id="download-button-container">
-      <button id="download-zip-button" onclick="downloadAllDayplots()">Download All Dayplots (ZIP)</button>
-  </div>
+
   
   <div id="map-wrapper">
       <div class="embed-map-responsive">
@@ -429,18 +403,7 @@
     }
     // ---------------------------------------------
     
-    // -------------------------------------------------
-    // DOWNLOAD BUTTON LOGIC
-    // -------------------------------------------------
-    function downloadAllDayplots() {
-        // In a real-world scenario, this function would initiate a request
-        // to a backend service that aggregates all dayplots and serves them
-        // as a single ZIP file.
-        alert("Download initiated. A real-world application would now start downloading a ZIP file generated on the server.");
-        
-        // Example of a typical download initiation (if a fixed endpoint existed):
-        // window.location.href = '/api/download/all_dayplots.zip';
-    }
+--------------------------------------------
 
     // -------------------------------------------------
     // Load CSV
@@ -614,4 +577,5 @@
   </script>
 </body>
 </html>
+
 
